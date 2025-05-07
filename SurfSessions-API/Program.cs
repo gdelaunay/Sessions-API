@@ -1,4 +1,11 @@
+using SurfSessions_API;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Chargement des variables d'environnement du fichier .env
+DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), "SurfSessions-API.env"));
+// Exemple d'utilisation : Console.WriteLine( "VARIABLE_TEST = " + Environment.GetEnvironmentVariable("VARIABLE_TEST"));
+
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
