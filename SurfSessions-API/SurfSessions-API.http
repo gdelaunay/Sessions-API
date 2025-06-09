@@ -1,6 +1,0 @@
-@SurfSessions_API_HostAddress = http://localhost:5038
-
-GET {{SurfSessions_API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
