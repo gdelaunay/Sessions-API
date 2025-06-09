@@ -1,15 +1,42 @@
 services:
-  sqlserver:
-    env_file: "SurfSessions-API.env"
-    image: mcr.microsoft.com/mssql/server:2022-CU18-ubuntu-22.04
-    container_name: sqlserver-surfsessions
+  mysql:
+    image: mysql:9.3.0
+    container_name: mysql-surfsessions
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=${SA_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     ports:
-      - "1435:1435"
+      - "1434:3306"
+    networks:
+      - surfsessions-network
     volumes:
-      - sqlserver_data:/var/opt/mssql
+      - mysql-surfsessions-data:/var/lib/mysql
+    restart: unless-stopped
+  
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: app-surfsessions
+    container_name: app-surfsessions
+    environment:
+      - APP_UID=1655
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNET_VERSION=9.0.0
+      - DOTNET_RUNNING_IN_CONTAINER=true
+      - DOTNET_VERSION=9.0.0
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    ports:
+      - "5038:8080"
+    networks:
+      - surfsessions-network
+    depends_on:
+      - mysql
+    restart: unless-stopped
 
 volumes:
-  sqlserver_data:
+  mysql-surfsessions-data:
+    external: true
+
+networks:
+  surfsessions-network:
+    external: true
