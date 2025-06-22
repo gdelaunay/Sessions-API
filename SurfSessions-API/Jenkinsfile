@@ -1,0 +1,51 @@
+pipeline {
+  agent any
+
+  environment {
+    GIT_REPO_URL = 'http://github.com/2iAcademy/SurfSessions-API'
+    GIT_REPO_NAME = 'SurfSessions-API-main'
+    APP_FOLDER = 'SurfSessions-API'
+    PATH = "/opt/bin:/opt/sbin:${env.PATH}"
+  }
+
+  stages {
+     
+    stage('Téléchargement des sources') {
+      steps {
+        sh '''
+          echo "[1/5] Nettoyage..."
+          rm -rf "${APP_FOLDER}" repo.zip "${GIT_REPO_NAME}"
+
+          echo "[2/5] Téléchargement ZIP depuis GitHub..."
+          curl -L -o repo.zip ${GIT_REPO_URL}/archive/refs/heads/main.zip
+
+          echo "[3/5] Décompression et extraction de '${APP_FOLDER}'..."
+          unzip repo.zip
+          mv "${GIT_REPO_NAME}/${APP_FOLDER}" ./
+
+          echo "[4/5] Nettoyage des fichiers temporaires..."
+          rm -rf ${GIT_REPO_NAME} repo.zip
+          
+          echo "[5/5] Récupération des secrets d'environment..."
+          cp ./secrets/sessions.env "./${APP_FOLDER}/.env"
+        '''
+      }
+    }
+
+    stage('Arrêt des anciens containers') {
+      steps {
+        sh '''
+          docker compose -f "${APP_FOLDER}/docker-compose.yaml" down || true
+        '''
+      }
+    }
+
+    stage('Build et lancement') {
+      steps {
+        sh '''
+          docker compose -f "${APP_FOLDER}/docker-compose.yaml" up -d --build
+        '''
+      }
+    }
+  }
+}

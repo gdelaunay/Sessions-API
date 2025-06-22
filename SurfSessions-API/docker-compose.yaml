@@ -5,7 +5,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     ports:
-      - "1434:3306"
+      - "3306:3306"
     networks:
       - surfsessions-network
     volumes:
