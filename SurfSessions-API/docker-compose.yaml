@@ -20,21 +20,31 @@ services:
     container_name: app-surfsessions
     environment:
       - APP_UID=1655
-      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_URLS=http://+:8080;https://+:7202
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/cert/gdelaunay_cert.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
       - ASPNET_VERSION=9.0.0
       - DOTNET_RUNNING_IN_CONTAINER=true
       - DOTNET_VERSION=9.0.0
       - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     ports:
       - "5038:8080"
+      - "7202:7202"
     networks:
       - surfsessions-network
     depends_on:
       - mysql
+    volumes:
+      - app-sessions-keys:/root/.aspnet/DataProtection-Keys
+      - cert-shared:/cert:ro
     restart: unless-stopped
 
 volumes:
   mysql-surfsessions-data:
+    external: true
+  app-sessions-keys:
+    external: true
+  cert-shared:
     external: true
 
 networks:
