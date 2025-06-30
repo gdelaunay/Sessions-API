@@ -17,16 +17,38 @@ public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService>
         var weaterDailyUrl =  $"{_weatherApiUrl}/marine?latitude={lat}&longitude={lon}&{weatherDailyParams}";
         
         var response = await httpClient.GetAsync(marineDailyUrl);
-        
         if (!response.IsSuccessStatusCode)
         {
             logger.LogError(await response.Content.ReadAsStringAsync());
         }
-        
         var json = await response.Content.ReadAsStringAsync();
         
-        Console.WriteLine("json: " + json);
+        var daily = JsonDocument.Parse(json).RootElement.GetProperty("daily");
+
+        var dates = new List<string>();
+        foreach (JsonElement date in daily.GetProperty("time").EnumerateArray())
+        {
+            dates.Add(date.GetString() ?? string.Empty);
+        }
+
+        var heights = new List<float>();
+        foreach (JsonElement height in daily.GetProperty("wave_height_max").EnumerateArray().ToList())
+        {
+            heights.Add(height.GetSingle());   
+        }
         
-        return JsonSerializer.Deserialize<DailyForecast>(json);
+        var directions =  new List<int>();
+        foreach (JsonElement direction in daily.GetProperty("wave_direction_dominant").EnumerateArray().ToList())
+        {
+            directions.Add(direction.GetInt32());
+        }
+        
+        var periods =  new List<float>();
+        foreach (JsonElement period in daily.GetProperty("wave_period_max").EnumerateArray().ToList())
+        {
+            periods.Add(period.GetSingle()); 
+        }
+        
+        return new DailyForecast(dates, heights, directions, periods);
     }
 }
