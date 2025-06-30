@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using SurfSessions_API;
 using SurfSessions_API.Data;
+using SurfSessions_API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,11 +13,17 @@ DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
 
 
 // Add services to the container.
+// Ajout des controllers
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.PropertyNamingPolicy = null;
 });;
+
+// Ajout du service d'appel à l'API de prévision
+// (et transformation des données)
+builder.Services.AddHttpClient<WeatherApiService>();
+
 
 // Add DB connection & DB context
 builder.Services.AddDbContext<AppDbContext>(options => 
