@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using SurfSessions_API;
@@ -5,6 +6,10 @@ using SurfSessions_API.Data;
 using SurfSessions_API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//
+CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("fr-FR");
 
 // Chargement des variables d'environnement du fichier .env
 DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));

@@ -16,12 +16,9 @@ public class DailyForecastController(WeatherApiService weatherService)//AppDbCon
     //private readonly AppDbContext _context = context;
     private readonly WeatherApiService _weatherService = weatherService;
 
-    [HttpGet]
-    public async Task<DailyForecast?> Get()
+    public async Task<DailyForecast?> Get(float lat, float lon)
     {
-        var data = await _weatherService.GetDailyForecast();
-        Console.WriteLine("data : " + JsonSerializer.Serialize(data));
-        return data;
+        return await _weatherService.GetDailyForecast(lat, lon);;
     }
 
 }
