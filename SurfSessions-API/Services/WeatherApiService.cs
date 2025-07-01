@@ -14,7 +14,7 @@ public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService>
         var marineDailyUrl = $"{_weatherApiUrl}/marine?latitude={lat}&longitude={lon}&{marineDailyParams}";
 
         const string weatherDailyParams = "daily=weather_code,temperature_2m_max,wind_speed_10m_max,wind_direction_10m_dominant&timezone=Europe%2FBerlin&wind_speed_unit=kn";
-        var weatherDailyUrl =  $"{_weatherApiUrl}/marine?latitude={lat}&longitude={lon}&{weatherDailyParams}";
+        var weatherDailyUrl =  $"{_weatherApiUrl}/forecast?latitude={lat}&longitude={lon}&{weatherDailyParams}";
         
         // Appel API météo marine - Vagues
         var response = await httpClient.GetAsync(marineDailyUrl);
@@ -51,7 +51,7 @@ public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService>
         }
                 
         // Appel API météo marine - Vent et météo
-        response = await httpClient.GetAsync("https://api.open-meteo.com/v1/forecast?latitude=47.1283&longitude=-2.2159&daily=weather_code,temperature_2m_max,wind_speed_10m_max,wind_direction_10m_dominant&timezone=Europe%2FBerlin&wind_speed_unit=kn");
+        response = await httpClient.GetAsync(weatherDailyUrl);
         if (!response.IsSuccessStatusCode)
         {
             logger.LogError(await response.Content.ReadAsStringAsync());
@@ -66,18 +66,9 @@ public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService>
             weatherCodes.Add(weatherCode.GetInt32());
         }
 
-        var temperatures = new List<float>();
-        foreach (var temperature in daily.GetProperty("temperature_2m_max").EnumerateArray())
-        {
-            temperatures.Add(temperature.GetSingle());   
-        }
-        
-        var windSpeeds = new List<float>();
-        foreach (var windSpeed in daily.GetProperty("wind_speed_10m_max").EnumerateArray())
-        {
-            windSpeeds.Add(windSpeed.GetSingle());   
-        }
-       
+        var temperatures = daily.GetProperty("temperature_2m_max").EnumerateArray().Select(temperature => temperature.GetSingle()).ToList();
+        var windSpeeds = daily.GetProperty("wind_speed_10m_max").EnumerateArray().Select(windSpeed => windSpeed.GetSingle()).ToList();
+
         var windDirections = new List<int>();
         foreach (var windDirection in daily.GetProperty("wind_direction_10m_dominant").EnumerateArray())
         {

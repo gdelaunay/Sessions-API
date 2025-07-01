@@ -11,13 +11,11 @@ namespace SurfSessions_API.Controllers;
 [EnableCors]
 [ApiController]
 [Route("api/[controller]")]
-public class DailyForecastController(WeatherApiService weatherService)
+public class DailyForecastController(WeatherApiService weatherService, ILogger<DailyForecastController> logger)
 {
-    private readonly WeatherApiService _weatherService = weatherService;
-
     public async Task<DailyForecast?> Get(float lat, float lon)
     {
-        return await _weatherService.GetDailyForecast(lat, lon);
+        return await weatherService.GetDailyForecast(lat, lon);
     }
 
 }
