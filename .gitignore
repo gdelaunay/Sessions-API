@@ -1,5 +1,6 @@
 bin/
 obj/
+.sonarqube/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/

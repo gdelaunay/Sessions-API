@@ -7,14 +7,13 @@ using SurfSessions_API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//
+// Culture en-US pour parse les float au format "1.23" au lieu de "1,23"
 CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
 CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("fr-FR");
 
 // Chargement des variables d'environnement du fichier .env
 DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
-// Exemple d'utilisation :
-// Console.WriteLine( "VARIABLE_TEST = " + Environment.GetEnvironmentVariable("VARIABLE_TEST"));
+Console.WriteLine("VARIABLE_TEST = " + Environment.GetEnvironmentVariable("VARIABLE_TEST"));
 
 
 // Add services to the container.
@@ -23,7 +22,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.PropertyNamingPolicy = null;
-});;
+});
 
 // Ajout du service d'appel à l'API de prévision
 // (et transformation des données)
@@ -81,4 +80,4 @@ app.MapControllerRoute(
         pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-app.Run();
+await app.RunAsync();
