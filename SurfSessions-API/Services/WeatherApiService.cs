@@ -6,12 +6,13 @@ namespace SurfSessions_API.Services;
 
 public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService> logger)
 {
-    private readonly string _weatherApiUrl = "https://marine-api.open-meteo.com/v1";
+    private readonly string _marineApiUrl = "https://marine-api.open-meteo.com/v1";
+    private readonly string _weatherApiUrl = "https://api.open-meteo.com/v1";
 
     public async Task<DailyForecast?> GetDailyForecast(float lat, float lon)
     {
         const string marineDailyParams = "daily=wave_height_max,wave_direction_dominant,wave_period_max&timezone=Europe%2FBerlin";
-        var marineDailyUrl = $"{_weatherApiUrl}/marine?latitude={lat}&longitude={lon}&{marineDailyParams}";
+        var marineDailyUrl = $"{_marineApiUrl}/marine?latitude={lat}&longitude={lon}&{marineDailyParams}";
 
         const string weatherDailyParams = "daily=weather_code,temperature_2m_max,wind_speed_10m_max,wind_direction_10m_dominant&timezone=Europe%2FBerlin&wind_speed_unit=kn";
         var weatherDailyUrl =  $"{_weatherApiUrl}/forecast?latitude={lat}&longitude={lon}&{weatherDailyParams}";
@@ -51,6 +52,7 @@ public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService>
         }
                 
         // Appel API météo marine - Vent et météo
+        Console.WriteLine(weatherDailyUrl);
         response = await httpClient.GetAsync(weatherDailyUrl);
         if (!response.IsSuccessStatusCode)
         {
