@@ -10,12 +10,13 @@ public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService>
 
     public async Task<DailyForecast?> GetDailyForecast(float lat, float lon)
     {
-        var marineDailyParams = "daily=wave_height_max,wave_direction_dominant,wave_period_max&timezone=Europe%2FBerlin";
+        const string marineDailyParams = "daily=wave_height_max,wave_direction_dominant,wave_period_max&timezone=Europe%2FBerlin";
         var marineDailyUrl = $"{_weatherApiUrl}/marine?latitude={lat}&longitude={lon}&{marineDailyParams}";
 
-        var weatherDailyParams = "";
-        var weaterDailyUrl =  $"{_weatherApiUrl}/marine?latitude={lat}&longitude={lon}&{weatherDailyParams}";
+        const string weatherDailyParams = "daily=weather_code,temperature_2m_max,wind_speed_10m_max,wind_direction_10m_dominant&timezone=Europe%2FBerlin&wind_speed_unit=kn";
+        var weatherDailyUrl =  $"{_weatherApiUrl}/marine?latitude={lat}&longitude={lon}&{weatherDailyParams}";
         
+        // Appel API météo marine - Vagues
         var response = await httpClient.GetAsync(marineDailyUrl);
         if (!response.IsSuccessStatusCode)
         {
@@ -26,29 +27,70 @@ public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService>
         var daily = JsonDocument.Parse(json).RootElement.GetProperty("daily");
 
         var dates = new List<string>();
-        foreach (JsonElement date in daily.GetProperty("time").EnumerateArray())
+        foreach (var date in daily.GetProperty("time").EnumerateArray())
         {
             dates.Add(date.GetString() ?? string.Empty);
         }
 
         var heights = new List<float>();
-        foreach (JsonElement height in daily.GetProperty("wave_height_max").EnumerateArray().ToList())
+        foreach (var height in daily.GetProperty("wave_height_max").EnumerateArray())
         {
             heights.Add(height.GetSingle());   
         }
         
         var directions =  new List<int>();
-        foreach (JsonElement direction in daily.GetProperty("wave_direction_dominant").EnumerateArray().ToList())
+        foreach (var direction in daily.GetProperty("wave_direction_dominant").EnumerateArray())
         {
             directions.Add(direction.GetInt32());
         }
         
         var periods =  new List<float>();
-        foreach (JsonElement period in daily.GetProperty("wave_period_max").EnumerateArray().ToList())
+        foreach (var period in daily.GetProperty("wave_period_max").EnumerateArray())
         {
             periods.Add(period.GetSingle()); 
         }
+                
+        // Appel API météo marine - Vent et météo
+        response = await httpClient.GetAsync("https://api.open-meteo.com/v1/forecast?latitude=47.1283&longitude=-2.2159&daily=weather_code,temperature_2m_max,wind_speed_10m_max,wind_direction_10m_dominant&timezone=Europe%2FBerlin&wind_speed_unit=kn");
+        if (!response.IsSuccessStatusCode)
+        {
+            logger.LogError(await response.Content.ReadAsStringAsync());
+        }
+        json = await response.Content.ReadAsStringAsync();
         
-        return new DailyForecast(dates, heights, directions, periods);
+        daily = JsonDocument.Parse(json).RootElement.GetProperty("daily");
+        
+        var weatherCodes = new List<int>();
+        foreach (var weatherCode in daily.GetProperty("weather_code").EnumerateArray())
+        {
+            weatherCodes.Add(weatherCode.GetInt32());
+        }
+
+        var temperatures = new List<float>();
+        foreach (var temperature in daily.GetProperty("temperature_2m_max").EnumerateArray())
+        {
+            temperatures.Add(temperature.GetSingle());   
+        }
+        
+        var windSpeeds = new List<float>();
+        foreach (var windSpeed in daily.GetProperty("wind_speed_10m_max").EnumerateArray())
+        {
+            windSpeeds.Add(windSpeed.GetSingle());   
+        }
+       
+        var windDirections = new List<int>();
+        foreach (var windDirection in daily.GetProperty("wind_direction_10m_dominant").EnumerateArray())
+        {
+            windDirections.Add(windDirection.GetInt32());
+        }
+
+        return new DailyForecast(dates, 
+            weatherCodes,
+            temperatures,
+            heights, 
+            directions, 
+            periods,
+            windSpeeds,
+            windDirections);
     }
 }

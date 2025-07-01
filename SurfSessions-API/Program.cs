@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using SurfSessions_API;
@@ -13,10 +14,10 @@ CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("fr-FR");
 
 // Chargement des variables d'environnement du fichier .env
 DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
-Console.WriteLine("VARIABLE_TEST = " + Environment.GetEnvironmentVariable("VARIABLE_TEST"));
+Environment.GetEnvironmentVariable("VARIABLE_TEST");
 
+// --- Add services to the container.
 
-// Add services to the container.
 // Ajout des controllers
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -27,7 +28,6 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 // Ajout du service d'appel à l'API de prévision
 // (et transformation des données)
 builder.Services.AddHttpClient<WeatherApiService>();
-
 
 // Add DB connection & DB context
 builder.Services.AddDbContext<AppDbContext>(options => 
@@ -51,6 +51,9 @@ builder.Services.AddCors(options =>
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Add timestamp to logs
+builder.Logging.AddSimpleConsole(options => { options.TimestampFormat = "HH:mm:ss - "; });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -65,16 +68,37 @@ else
     app.UseHsts();
 }
 
-app.MapGet("/", () => "Hello World!");
+app.Use(async (context, next) =>
+{
+    var body = "";
+    if (new[] { "POST", "PUT", "PATCH" }.Contains(context.Request.Method))
+    {
+        context.Request.EnableBuffering();
+        body = await new StreamReader(context.Request.Body, Encoding.UTF8, leaveOpen: true).ReadToEndAsync();
+        context.Request.Body.Position = 0;
+    }
 
+    var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("gdelaunay.HttpRequestLogger");
+    logger.LogInformation(
+        $"Method : {context.Request.Method} \n" +
+        $"      Path : {context.Request.Path + context.Request.QueryString} \n" +
+        (string.IsNullOrEmpty(body) ? "" : $"      Body : {body} \n") +
+        $"      Host : {context.Request.Headers["Host"]} \n" +
+        $"      Adress : {
+            context.Request.Headers["X-Forwarded-For"].FirstOrDefault()
+            ?? context.Connection.RemoteIpAddress?.ToString()
+        }"
+    );
+    
+    await next();
+});
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowSpecificOrigins");
-
 app.UseAuthorization();
 
 app.MapStaticAssets();
-
+app.MapGet("/", () => "Bonjour monde!");
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")
