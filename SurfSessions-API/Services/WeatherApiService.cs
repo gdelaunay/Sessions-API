@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using SurfSessions_API.DTOs;
+using SurfSessions_API.Models;
 
 namespace SurfSessions_API.Services;
 
@@ -9,7 +9,7 @@ public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService>
     private readonly string _marineApiUrl = "https://marine-api.open-meteo.com/v1";
     private readonly string _weatherApiUrl = "https://api.open-meteo.com/v1";
 
-    public async Task<DailyForecast?> GetDailyForecast(float lat, float lon)
+    public async Task<List<Forecast>?> GetDailyForecast(float lat, float lon)
     {
         const string marineDailyParams = "daily=wave_height_max,wave_direction_dominant,wave_period_max&timezone=Europe%2FBerlin";
         var marineDailyUrl = $"{_marineApiUrl}/marine?latitude={lat}&longitude={lon}&{marineDailyParams}";
@@ -18,72 +18,50 @@ public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService>
         var weatherDailyUrl =  $"{_weatherApiUrl}/forecast?latitude={lat}&longitude={lon}&{weatherDailyParams}";
         
         // Appel API météo marine - Vagues
-        var response = await httpClient.GetAsync(marineDailyUrl);
-        if (!response.IsSuccessStatusCode)
+        var marineResponse = await httpClient.GetAsync(marineDailyUrl);
+        Console.WriteLine(marineDailyUrl);
+        if (!marineResponse.IsSuccessStatusCode)
         {
-            logger.LogError(await response.Content.ReadAsStringAsync());
-        }
-        var json = await response.Content.ReadAsStringAsync();
-        
-        var daily = JsonDocument.Parse(json).RootElement.GetProperty("daily");
-
-        var dates = new List<string>();
-        foreach (var date in daily.GetProperty("time").EnumerateArray())
-        {
-            dates.Add(date.GetString() ?? string.Empty);
-        }
-
-        var heights = new List<float>();
-        foreach (var height in daily.GetProperty("wave_height_max").EnumerateArray())
-        {
-            heights.Add(height.GetSingle());   
+            logger.LogError($"Échec de l'appel à l'API météo open-meteo.com : {marineResponse.Content.ReadAsStringAsync()}");
+            return null;
         }
         
-        var directions =  new List<int>();
-        foreach (var direction in daily.GetProperty("wave_direction_dominant").EnumerateArray())
-        {
-            directions.Add(direction.GetInt32());
-        }
-        
-        var periods =  new List<float>();
-        foreach (var period in daily.GetProperty("wave_period_max").EnumerateArray())
-        {
-            periods.Add(period.GetSingle()); 
-        }
-                
         // Appel API météo marine - Vent et météo
         Console.WriteLine(weatherDailyUrl);
-        response = await httpClient.GetAsync(weatherDailyUrl);
-        if (!response.IsSuccessStatusCode)
+        var weatherResponse = await httpClient.GetAsync(weatherDailyUrl);
+        if (!weatherResponse.IsSuccessStatusCode)
         {
-            logger.LogError(await response.Content.ReadAsStringAsync());
+            logger.LogError($"Échec de l'appel à l'API météo open-meteo.com : {weatherResponse.Content.ReadAsStringAsync()}");
+            return null;
+            
         }
-        json = await response.Content.ReadAsStringAsync();
         
-        daily = JsonDocument.Parse(json).RootElement.GetProperty("daily");
+        var marineDailyJson = JsonDocument.Parse(await marineResponse.Content.ReadAsStringAsync()).RootElement.GetProperty("daily");
+        var dates = marineDailyJson.GetProperty("time").EnumerateArray().ToList();
+        var heights = marineDailyJson.GetProperty("wave_height_max").EnumerateArray().ToList();
+        var directions = marineDailyJson.GetProperty("wave_direction_dominant").EnumerateArray().ToList();
+        var periods =  marineDailyJson.GetProperty("wave_period_max").EnumerateArray().ToList();
         
-        var weatherCodes = new List<int>();
-        foreach (var weatherCode in daily.GetProperty("weather_code").EnumerateArray())
+        var weatherDailyJson = JsonDocument.Parse(await weatherResponse.Content.ReadAsStringAsync()).RootElement.GetProperty("daily");
+        var weatherCodes = weatherDailyJson.GetProperty("weather_code").EnumerateArray().ToList();
+        var temperatures = weatherDailyJson.GetProperty("temperature_2m_max").EnumerateArray().ToList();
+        var windSpeeds = weatherDailyJson.GetProperty("wind_speed_10m_max").EnumerateArray().ToList();
+        var windDirections = weatherDailyJson.GetProperty("wind_direction_10m_dominant").EnumerateArray().ToList();
+        
+        var forecasts = new List<Forecast>();
+        foreach (var (i, date) in dates.Index())
         {
-            weatherCodes.Add(weatherCode.GetInt32());
+            var fDate = dates[i].GetString() ?? string.Empty;
+            var fHeight = heights[i].GetSingle();
+            var fDirection = directions[i].GetInt32();
+            var fPeriod = periods[i].GetSingle();
+            var fWeatherCode = weatherCodes[i].GetInt32();
+            var fTemperature = temperatures[i].GetSingle();
+            var fWindSpeed = windSpeeds[i].GetSingle();
+            var fWindDirection = windDirections[i].GetInt32();
+            forecasts.Add(new Forecast(fDate, fWeatherCode, fTemperature, fHeight, fDirection, fPeriod, fWindSpeed, fWindDirection));
         }
-
-        var temperatures = daily.GetProperty("temperature_2m_max").EnumerateArray().Select(temperature => temperature.GetSingle()).ToList();
-        var windSpeeds = daily.GetProperty("wind_speed_10m_max").EnumerateArray().Select(windSpeed => windSpeed.GetSingle()).ToList();
-
-        var windDirections = new List<int>();
-        foreach (var windDirection in daily.GetProperty("wind_direction_10m_dominant").EnumerateArray())
-        {
-            windDirections.Add(windDirection.GetInt32());
-        }
-
-        return new DailyForecast(dates, 
-            weatherCodes,
-            temperatures,
-            heights, 
-            directions, 
-            periods,
-            windSpeeds,
-            windDirections);
+        
+        return forecasts;
     }
 }
