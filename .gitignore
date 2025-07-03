@@ -1,9 +1,11 @@
+.idea/
 bin/
 obj/
 .sonarqube/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+Migrations/
 *.env
 *.env.dist
 README_PERSO.md
