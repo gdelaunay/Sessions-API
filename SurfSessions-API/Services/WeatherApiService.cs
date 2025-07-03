@@ -18,8 +18,8 @@ public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService>
         var weatherDailyUrl =  $"{_weatherApiUrl}/forecast?latitude={lat}&longitude={lon}&{weatherDailyParams}";
         
         // Appel API météo marine - Vagues
+        logger.LogInformation($"HTTP request url : {marineDailyUrl}");
         var marineResponse = await httpClient.GetAsync(marineDailyUrl);
-        Console.WriteLine(marineDailyUrl);
         if (!marineResponse.IsSuccessStatusCode)
         {
             logger.LogError($"Échec de l'appel à l'API météo open-meteo.com : {marineResponse.Content.ReadAsStringAsync()}");
@@ -27,7 +27,7 @@ public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService>
         }
         
         // Appel API météo marine - Vent et météo
-        Console.WriteLine(weatherDailyUrl);
+        logger.LogInformation($"HTTP request url : {weatherDailyUrl}");
         var weatherResponse = await httpClient.GetAsync(weatherDailyUrl);
         if (!weatherResponse.IsSuccessStatusCode)
         {
