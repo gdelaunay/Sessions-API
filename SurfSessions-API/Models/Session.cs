@@ -1,11 +1,27 @@
-﻿namespace SurfSessions_API.Models;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class Session(Spot spot, Forecast forecast, DateTime startTime, DateTime endTime, int rating, string comment)
-{
-    public Spot Spot { get; set; } = spot;
-    public Forecast Forecast { get; set; } = forecast;
-    public DateTime StartTime { get; set; } = startTime;
-    public DateTime EndTime { get; set; } = endTime;
-    public int Rating { get; set; } = rating;
-    public string Comment { get; set; } = comment;
+namespace SurfSessions_API.Models;
+
+public class Session
+{ 
+    public Session() {}
+    
+    public Session(Spot spot, Forecast forecast, DateTime startTime, DateTime endTime, int rating, string comment)
+    {
+        Spot = spot;
+        Forecast = forecast;
+        StartTime = startTime;
+        EndTime = endTime;
+        Rating = rating;
+        Comment = comment;
+    }
+    
+    public int Id { get; set; }
+    public required  Spot Spot { get; set; }
+    public required  Forecast Forecast { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public int? Rating { get; set; }
+    [MaxLength(800)]
+    public string Comment { get; set; } = string.Empty;
 }

@@ -68,6 +68,7 @@ else
     app.UseHsts();
 }
 
+// Custom HTTP Logger middleware
 app.Use(async (context, next) =>
 {
     var body = "";

@@ -1,21 +1,31 @@
-﻿namespace SurfSessions_API.Models;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class Forecast(
-    string dateTime,
-    int weatherCode,
-    float temperature,
-    float waveHeight,
-    int waveDirection,
-    float wavePeriod,
-    float windSpeed,
-    int windDirection)
+namespace SurfSessions_API.Models;
+
+public class Forecast
 {
-    public string DateTime { get; set; } = dateTime;
-    public int WeatherCode { get; set; } = weatherCode;
-    public float Temperature { get; set; } = temperature;
-    public float WaveHeight { get; set; } = waveHeight;
-    public int WaveDirection { get; set; } = waveDirection;
-    public float WavePeriod { get; set; } = wavePeriod;
-    public float WindSpeed { get; set; } = windSpeed;
-    public int WindDirection { get; set; } = windDirection;
+    public Forecast() {}
+
+    public Forecast(string dateTime, int weatherCode, float temperature, float waveHeight, int waveDirection, float wavePeriod, float windSpeed, int windDirection)
+    {
+        DateTime = dateTime;
+        WeatherCode = weatherCode;
+        Temperature = temperature;
+        WaveHeight = waveHeight;
+        WaveDirection = waveDirection;
+        WavePeriod = wavePeriod;
+        WindSpeed = windSpeed;
+        WindDirection = windDirection;
+    }
+    
+    public int Id { get; set; } 
+    [MaxLength(255)]
+    public string DateTime { get; set; } = string.Empty;
+    public int WeatherCode { get; set; }
+    public float Temperature { get; set; }
+    public float WaveHeight { get; set; }
+    public int WaveDirection { get; set; }
+    public float WavePeriod { get; set; }
+    public float WindSpeed { get; set; }
+    public int WindDirection { get; set; }
 }
