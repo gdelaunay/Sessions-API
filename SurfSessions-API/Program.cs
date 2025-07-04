@@ -14,9 +14,10 @@ CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("fr-FR");
 
 // Chargement des variables d'environnement du fichier .env
 DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
-Environment.GetEnvironmentVariable("VARIABLE_TEST");
+Console.WriteLine(Environment.GetEnvironmentVariable("VARIABLE_TEST"));
 
-// --- Add services to the container.
+
+// ------------------------------ SERVICES ------------------------------ //
 
 // Ajout des controllers
 builder.Services.AddControllers().AddJsonOptions(options =>
@@ -30,8 +31,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddHttpClient<WeatherApiService>();
 
 // Add DB connection & DB context
-builder.Services.AddDbContext<AppDbContext>(options => 
-    options.UseMySQL(Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING")!));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseMySQL(Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING")));
 
 // Add allowed origins (local & dist)
 builder.Services.AddCors(options =>
@@ -55,6 +55,10 @@ builder.Services.AddOpenApi();
 builder.Logging.AddSimpleConsole(options => { options.TimestampFormat = "HH:mm:ss - "; });
 
 var app = builder.Build();
+var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("gdelaunay.Sessions-API");
+
+
+// ------------------------------ CONFIGURATION ------------------------------ //
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -68,7 +72,7 @@ else
     app.UseHsts();
 }
 
-// Custom HTTP Logger middleware
+// Configure un middleware logger HTTP
 app.Use(async (context, next) =>
 {
     var body = "";
@@ -79,8 +83,8 @@ app.Use(async (context, next) =>
         context.Request.Body.Position = 0;
     }
 
-    var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("gdelaunay.HttpRequestLogger");
-    logger.LogInformation(
+    var loggerHttp = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("gdelaunay.HttpRequestLogger");
+    loggerHttp.LogInformation(
         $"Method : {context.Request.Method} \n" +
         $"      Path : {context.Request.Path + context.Request.QueryString} \n" +
         (string.IsNullOrEmpty(body) ? "" : $"      Body : {body} \n") +
@@ -93,16 +97,37 @@ app.Use(async (context, next) =>
     
     await next();
 });
+
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowSpecificOrigins");
 app.UseAuthorization();
 
+
+// ------------------------------ MAPPING  ------------------------------ //
 app.MapStaticAssets();
+
 app.MapGet("/", () => "Bonjour monde!");
+
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-await app.RunAsync();
+// Mappage pour download le json OpenApi
+app.MapGet("/openapi/download", async context =>
+{
+    var httpClient = new HttpClient();
+    var json = await httpClient.GetStringAsync($"{context.Request.Scheme}://{context.Request.Host}/openapi/v1.json");
+    context.Response.Headers.Append("Content-Disposition", "attachment; filename=openapi-v1.json");
+    context.Response.ContentType = "application/json";
+    await context.Response.WriteAsync(json);
+});
+
+
+await app.StartAsync();
+
+logger.LogInformation($"Document OpenAPI : {app.Urls.FirstOrDefault()}/openapi/v1.json");
+logger.LogInformation($"Lien de téléchargement : {app.Urls.FirstOrDefault()}/openapi/download");
+
+await app.WaitForShutdownAsync();
