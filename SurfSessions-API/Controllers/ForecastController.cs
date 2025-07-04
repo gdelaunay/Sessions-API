@@ -16,7 +16,7 @@ public class ForecastController(WeatherApiService weatherService, ILogger<Foreca
         var dailyForecast = await weatherService.GetDailyForecast(lat, lon);
         if (dailyForecast == null)
         {
-            return NotFound(new List<Forecast>(new Forecast[7]));
+            return NotFound();
         }
         return Ok(dailyForecast);
     }

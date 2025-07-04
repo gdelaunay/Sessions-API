@@ -22,7 +22,7 @@ public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService>
         var marineResponse = await httpClient.GetAsync(marineDailyUrl);
         if (!marineResponse.IsSuccessStatusCode)
         {
-            logger.LogError($"Échec de l'appel à l'API météo open-meteo.com : {marineResponse.Content.ReadAsStringAsync()}");
+            logger.LogError($"Échec de l'appel à l'API météo open-meteo.com : {(int)marineResponse.StatusCode} - {marineResponse.ReasonPhrase}");
             return null;
         }
         
@@ -31,7 +31,7 @@ public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService>
         var weatherResponse = await httpClient.GetAsync(weatherDailyUrl);
         if (!weatherResponse.IsSuccessStatusCode)
         {
-            logger.LogError($"Échec de l'appel à l'API météo open-meteo.com : {weatherResponse.Content.ReadAsStringAsync()}");
+            logger.LogError($"Échec de l'appel à l'API météo open-meteo.com : {(int)weatherResponse.StatusCode} - {weatherResponse.ReasonPhrase}");
             return null;
             
         }
