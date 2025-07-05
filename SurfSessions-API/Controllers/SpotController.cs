@@ -52,7 +52,7 @@ public class SpotController(AppDbContext context) : Controller
         var spot = await _context.Spots.FindAsync(id);
         if (spot == null)
         {
-            return BadRequest("Le spot n'existe pas.");
+            return NotFound("Le spot n'existe pas.");
         }
         _context.Spots.Remove(spot);
         await _context.SaveChangesAsync();

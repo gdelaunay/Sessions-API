@@ -87,7 +87,7 @@ app.Use(async (context, next) =>
     loggerHttp.LogInformation(
         $"Method : {context.Request.Method} \n" +
         $"      Path : {context.Request.Path + context.Request.QueryString} \n" +
-        (string.IsNullOrEmpty(body) ? "" : $"      Body : {body} \n") +
+        (string.IsNullOrEmpty(body) ? "" : $"      Body : \n{body} \n") +
         $"      Host : {context.Request.Headers["Host"]} \n" +
         $"      Adress : {
             context.Request.Headers["X-Forwarded-For"].FirstOrDefault()
