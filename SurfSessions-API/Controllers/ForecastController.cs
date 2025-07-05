@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SurfSessions_API.Data;
 using SurfSessions_API.Models;
 using SurfSessions_API.Services;
 
@@ -8,8 +10,11 @@ namespace SurfSessions_API.Controllers;
 [EnableCors]
 [ApiController]
 [Route("api/[controller]")]
-public class ForecastController(WeatherApiService weatherService, ILogger<ForecastController> logger) : ControllerBase 
+public class ForecastController(WeatherApiService weatherService, AppDbContext context, ILogger<ForecastController> logger) : ControllerBase 
 {
+      
+    private readonly AppDbContext _context = context;
+
     [HttpGet("daily")]
     public async Task<ActionResult<List<Forecast>?>> GetDaily(float lat, float lon)
     {
@@ -19,5 +24,51 @@ public class ForecastController(WeatherApiService weatherService, ILogger<Foreca
             return NotFound();
         }
         return Ok(dailyForecast);
+    }
+  
+    [HttpGet]
+    public async Task<ActionResult<List<Forecast>>> GetAll()
+    {
+        return Ok(await _context.Forecasts.ToListAsync());
+    }
+    
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<Forecast>> Get(int id)
+    {
+        return await _context.Forecasts.FirstOrDefaultAsync(s => s.Id == id) ?? (ActionResult<Forecast>) NotFound();
+    }
+    
+    [HttpPost]
+    public async Task<ActionResult<Forecast>> Post(Forecast forecast)
+    {
+        _context.Forecasts.Add(forecast);
+        await _context.SaveChangesAsync();
+        return CreatedAtAction(nameof(Get), new { id = forecast.Id }, forecast);
+    }
+    
+    [HttpPut]
+    public async Task<ActionResult<Forecast>> Put(int id, Forecast updatedForecast)
+    {
+        var forecast = await _context.Forecasts.FindAsync(id);
+        if (forecast == null)
+        {
+            return BadRequest("La prévision n'existe pas.");
+        }
+        _context.Entry(forecast).CurrentValues.SetValues(updatedForecast);
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+    
+    [HttpDelete]
+    public async Task<ActionResult<Forecast>> Delete(int id)
+    {
+        var forecast = await _context.Forecasts.FindAsync(id);
+        if (forecast == null)
+        {
+            return NotFound("La prévision n'existe pas.");
+        }
+        _context.Forecasts.Remove(forecast);
+        await _context.SaveChangesAsync();
+        return NoContent();
     }
 }
