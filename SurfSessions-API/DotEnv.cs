@@ -10,7 +10,10 @@ public static class DotEnv
     public static void Load(string filePath)
     {
         if (!File.Exists(filePath))
+        {
+            Console.WriteLine(".env file named \"" + filePath + "\" not found");
             return;
+        }
 
         foreach (var line in File.ReadAllLines(filePath))
         {

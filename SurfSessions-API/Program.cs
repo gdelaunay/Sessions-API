@@ -14,6 +14,7 @@ CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("fr-FR");
 
 // Chargement des variables d'environnement du fichier .env
 DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
+DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), "/App/.env"));
 Console.WriteLine(Environment.GetEnvironmentVariable("VARIABLE_TEST"));
 
 
