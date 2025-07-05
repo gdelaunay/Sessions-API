@@ -18,12 +18,31 @@ public class ForecastController(WeatherApiService weatherService, AppDbContext c
     [HttpGet("daily")]
     public async Task<ActionResult<List<Forecast>?>> GetDaily(float lat, float lon)
     {
-        var dailyForecast = await weatherService.GetDailyForecast(lat, lon);
-        if (dailyForecast == null)
+        try
         {
-            return NotFound();
+            var dailyForecast = await weatherService.GetDailyForecast(lat, lon);
+            return Ok(dailyForecast);
         }
-        return Ok(dailyForecast);
+        catch (HttpRequestException e)
+        {
+            logger.LogError("Échec de l'appel à l'API météo open-meteo.com : {MarineResponseReasonPhrase}", e.Message);
+            return StatusCode(503, $"Échec de l'appel à l'API météo open-meteo.com : {e.Message}");
+        }
+    }
+    
+    [HttpGet("3hourly")]
+    public async Task<ActionResult<List<Forecast>?>> Get3Hourly(float lat, float lon)
+    {
+        try
+        {
+            var hourly3Forecast = await weatherService.Get3HourlyForecast(lat, lon);
+            return Ok(hourly3Forecast);
+        }
+        catch (HttpRequestException e)
+        {
+            logger.LogError("Échec de l'appel à l'API météo open-meteo.com : {WeatherResponseReasonPhrase}", e.Message);
+            return StatusCode(503, $"Échec de l'appel à l'API météo open-meteo.com : {e.Message}");
+        }
     }
   
     [HttpGet]

@@ -109,10 +109,7 @@ app.MapStaticAssets();
 
 app.MapGet("/", () => "Bonjour monde!");
 
-app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+app.MapControllers();
 
 // Mappage pour download le json OpenApi
 app.MapGet("/openapi/download", async context =>
@@ -123,7 +120,6 @@ app.MapGet("/openapi/download", async context =>
     context.Response.ContentType = "application/json";
     await context.Response.WriteAsync(json);
 });
-
 
 await app.StartAsync();
 
