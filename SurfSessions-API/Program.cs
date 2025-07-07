@@ -40,8 +40,8 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins("http://localhost:4200",
-                    "http://sessions.gdelaunay.fr",
-                    "https://sessions.gdelaunay.fr")
+                    "http://*.gdelaunay.fr",
+                    "https://*.gdelaunay.fr")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .WithExposedHeaders("Location");
