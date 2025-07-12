@@ -8,4 +8,6 @@ riderModule.iml
 Migrations/
 *.env
 *.env.dist
+/SurfSessions-API/appsettings.json
+*.DotSettings.user
 README_PERSO.md
