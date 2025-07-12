@@ -31,17 +31,16 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddHttpClient<WeatherApiService>();
 
 // Add DB connection & DB context
-builder.Services.AddDbContext<AppDbContext>(options => options.UseMySQL(Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING")));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseMySQL(Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING")!));
 
-// Add allowed origins (local & dist)
+// Add Cors
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins",
         policy =>
         {
-            policy.WithOrigins("http://localhost:4200",
-                    "http://*.gdelaunay.fr",
-                    "https://*.gdelaunay.fr")
+            policy.WithOrigins(allowedOrigins!)
                 .SetIsOriginAllowedToAllowWildcardSubdomains()
                 .AllowAnyMethod()
                 .AllowAnyHeader()
