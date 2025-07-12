@@ -5,7 +5,6 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
-Migrations/
 *.env
 *.env.dist
 /SurfSessions-API/appsettings.json
