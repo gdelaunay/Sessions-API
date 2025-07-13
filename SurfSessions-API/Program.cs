@@ -26,14 +26,13 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.PropertyNamingPolicy = null;
 });
 
-// Ajout du service d'appel à l'API de prévision
-// (et transformation des données)
+// Ajout du service de prévisions météo, appel à l'API Open-meteo et transformation des données
 builder.Services.AddHttpClient<WeatherApiService>();
 
-// Add DB connection & DB context
+// Ajout du service BDD
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySQL(Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING")!));
 
-// Add Cors
+// Ajout d'une configuration Cors
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 builder.Services.AddCors(options =>
 {
@@ -51,7 +50,7 @@ builder.Services.AddCors(options =>
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-// Add timestamp to logs
+// Ajout d'un timestamp aux logs
 builder.Logging.AddSimpleConsole(options => { options.TimestampFormat = "HH:mm:ss - "; });
 
 var app = builder.Build();
@@ -64,6 +63,15 @@ var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("gde
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    // Mappage pour download le json OpenApi
+    app.MapGet("/openapi/download", async context =>
+    {
+        var httpClient = new HttpClient();
+        var json = await httpClient.GetStringAsync($"{context.Request.Scheme}://{context.Request.Host}/openapi/v1.json");
+        context.Response.Headers.Append("Content-Disposition", "attachment; filename=openapi-v1.json");
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync(json);
+    });
 }
 else
 {
@@ -98,32 +106,30 @@ app.Use(async (context, next) =>
     await next();
 });
 
+// Effectue la migration de la BDD
+if (args.Contains("--migrate"))
+{
+    using var scope = app.Services.CreateScope();
+    AppDbService.MigrateIfNeeded(scope.ServiceProvider, 3, 5);
+}
+
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowSpecificOrigins");
 app.UseAuthorization();
 
 
-// ------------------------------ MAPPING  ------------------------------ //
 app.MapStaticAssets();
-
+app.MapControllers();
 app.MapGet("/", () => "Bonjour monde!");
 
-app.MapControllers();
-
-// Mappage pour download le json OpenApi
-app.MapGet("/openapi/download", async context =>
-{
-    var httpClient = new HttpClient();
-    var json = await httpClient.GetStringAsync($"{context.Request.Scheme}://{context.Request.Host}/openapi/v1.json");
-    context.Response.Headers.Append("Content-Disposition", "attachment; filename=openapi-v1.json");
-    context.Response.ContentType = "application/json";
-    await context.Response.WriteAsync(json);
-});
 
 await app.StartAsync();
 
-logger.LogInformation($"Document OpenAPI : {app.Urls.FirstOrDefault()}/openapi/v1.json");
-logger.LogInformation($"Lien de téléchargement : {app.Urls.FirstOrDefault()}/openapi/download");
+if (app.Environment.IsDevelopment())
+{
+    logger.LogInformation($"Document OpenAPI : {app.Urls.FirstOrDefault()}/openapi/v1.json");
+    logger.LogInformation($"Lien de téléchargement : {app.Urls.FirstOrDefault()}/openapi/download");
+}
 
 await app.WaitForShutdownAsync();
