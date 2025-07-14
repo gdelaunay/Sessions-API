@@ -2,11 +2,11 @@
 
 namespace SurfSessions_API.Data;
 
-public class AppDbService
+public static class AppDbService
 {
     public static void MigrateIfNeeded(IServiceProvider services, int maxRetries = 3, int delaySeconds = 5)
     {
-        var logger = services.GetRequiredService<ILoggerFactory>().CreateLogger("AppDbService");
+        var logger = services.GetRequiredService<ILoggerFactory>().CreateLogger("gdelaunay.AppDbService");
         var db = services.GetRequiredService<AppDbContext>();
 
         logger.LogInformation("Checking if there are pending database migrations ...");
@@ -30,13 +30,13 @@ public class AppDbService
             {
                 if (attempt != maxRetries)
                 {
-                    logger.LogError("Database connection attempt {Attempt}/{maxRetries} failed ...", attempt, maxRetries);
+                    logger.LogWarning("Database connection attempt {Attempt}/{maxRetries} failed ...", attempt, maxRetries);
                     Thread.Sleep(TimeSpan.FromSeconds(delaySeconds));
                 }
                 else
                 {
                     logger.LogError("All {maxRetries} attempts to connect to the database have failed. Please ensure the database is " +
-                                    "running and that the connection string at Program.cs:33 is correct. \n",  maxRetries);
+                                    "running and that the connection string lines at Program.cs:29 is correct. \n",  maxRetries);
                     throw;
                 }
             }

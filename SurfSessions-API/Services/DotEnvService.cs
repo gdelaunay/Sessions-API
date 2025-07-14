@@ -1,17 +1,16 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace SurfSessions_API;
+namespace SurfSessions_API.Services;
 
-using System;
-using System.IO;
-
-public static class DotEnv
+public static class DotEnvService
 {
+    public static ILogger? Logger { get; set; }
+    
     public static void Load(string filePath)
     {
         if (!File.Exists(filePath))
         {
-            Console.WriteLine(".env file named \"" + filePath + "\" not found");
+            Logger?.LogWarning(".env file \"{filePath}\" not found, you can ignore this warning in a Docker deployment.", filePath);
             return;
         }
 
@@ -47,5 +46,7 @@ public static class DotEnv
 
             Environment.SetEnvironmentVariable(key, value);
         }
+        
+        Logger?.LogInformation(".env file \"{filePath}\" loaded successfully.", filePath);
     }
 }
