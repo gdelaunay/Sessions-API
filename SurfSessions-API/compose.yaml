@@ -1,0 +1,63 @@
+services:
+  
+  web:
+    image: sessions-web
+    container_name: sessions-web
+    networks:
+      - sessions-network
+ 
+  api:
+    build:
+      context: .
+    image: sessions-api
+    container_name: sessions-api
+    environment:
+      - MYSQL_CONNECTION_STRING=${MYSQL_CONNECTION_STRING}
+      - ASPNETCORE_URLS=http://+:5050
+    command: ["--migrate"]
+    depends_on:
+      - mysql
+    #ports:
+    #  - "5050:5050"   # Développement
+    networks:
+      - sessions-network
+    volumes:
+      - sessions-api-keys:/root/.aspnet/DataProtection-Keys
+   
+  mysql:
+     image: mysql:9.3.0
+     container_name: sessions-mysql
+     environment:
+       - MYSQL_DATABASE=SessionsDb
+       - MYSQL_USER=${MYSQL_USER}
+       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+     #ports:
+     #  - "3306:3306"  # Développement
+     networks:
+       - sessions-network
+     volumes:
+       - sessions-mysql-data:/var/lib/mysql
+  
+  rproxy:
+    image: nginx:1.29-alpine
+    container_name: sessions-rproxy
+    depends_on:
+      - web
+      - api
+    ports:
+      - "80:80"
+    #  - "443:443"   # HTTPS
+    networks:
+      - sessions-network
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    #  - ./nginx/certs:/etc/nginx/certs:ro  # HTTPS
+
+
+volumes:
+  sessions-mysql-data:
+  sessions-api-keys:
+
+networks:
+  sessions-network:
