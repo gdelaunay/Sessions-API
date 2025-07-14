@@ -27,14 +27,13 @@ une note sur 5, des photos et/ou un commentaire, fournissant un journal complet 
 ## Prérequis
 
 S'assurer d'avoir le SDK **.NET 9**, **Docker** et **Docker compose** d'installés.
-
-1. Vérifier que le SDK **.NET 9** est installé :
+- **Développement** → Vérifier que le SDK **.NET 9** est installé :
 ```bash
 dotnet --version
 ```
 Si la commande n'est pas trouvée ou que la version n'est pas ``9.x.x``, installer [.NET 9](https://dotnet.microsoft.com/download/dotnet/9.0).
 
-2. Vérifier que **Docker** et **Docker compose** sont installés :
+- **Déploiement** → Vérifier que **Docker** et **Docker compose** sont installés :
 ```bash
 docker --version
 docker compose version
@@ -47,7 +46,7 @@ Si les commandes ne sont pas trouvées, installer [Docker](https://docs.docker.c
 1. Cloner le dépôt :
 ```bash
 git clone https://github.com/gdelaunay/SurfSessions-API.git
-cd SurfSessions-API
+cd SurfSessions-API/SurfSessions-API
 ```
 
 2. Copier le fichier ``.env`` d'exemple :
