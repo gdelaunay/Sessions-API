@@ -125,11 +125,24 @@ Une fois tous les containers lancés, l'application est disponible à l'adresse 
 
 ## Déploiement HTTPS
 
->**Nécessite d'effectuer l'étape 1 de la section [Déploiement](#déploiement).**
-
 Un support du protocole HTTPS est préconfiguré, nécessitant de disposer d'un nom de domaine. Pour déployer avec HTTPS :
 
-1. Décommenter les lignes ``HTTPS`` dans la section ``rproxy`` du fichier ``compose.yaml``, pour ouvrir le port HTTPS et monter le volume des certificats :
+1. Si ce n'est pas déjà fait, installer le projet [SurfSessions-Web](https://github.com/gdelaunay/SurfSessions-Web) dans un nouveau dossier :
+```bash
+git clone https://github.com/gdelaunay/SurfSessions-Web.git
+```
+- Modifier la valeur de ``sessionsApiUrl`` dans ``src/app/app.component.ts - ligne:7``, en remplacant ``mydomain.com`` par notre nom de domaine, ou sous-domaine :
+```typescript
+const sessionsApiUrl_HTTPS = 'https://mydomain.com/api';
+
+export const sessionsApiUrl: string = sessionsApiUrl_HTTPS;
+```
+- Puis construire son image Docker (requise par le  ``compose.yaml``) :
+```bash
+docker compose build
+```
+
+1. Dans le projet SurfSession-API, décommenter les lignes ``HTTPS`` dans la section ``rproxy`` du fichier ``compose.yaml``, pour ouvrir le port HTTPS et monter le volume des certificats :
 ```yaml
     ports:
       - "80:80"
@@ -140,7 +153,7 @@ Un support du protocole HTTPS est préconfiguré, nécessitant de disposer d'un 
       - ./nginx/certs:/etc/nginx/certs:ro  # HTTPS
 ```
 2. Décommenter la section server ``HTTPS`` dans le fichier ``nginx/conf.d/default.conf`` et remplacer tous les ``mydomain.com``
-(dans ``server_name``, ``ssl_certificate`` et ``ssl_certificate_key``) par notre nom de domaine, ou sous-domaine:
+(dans ``server_name``, ``ssl_certificate`` et ``ssl_certificate_key``) par notre nom de domaine :
 ```nginx configuration
 # HTTPS 
 server {
@@ -163,7 +176,7 @@ server {
 }
 ```
 3. Pour générer un certificat avec **Let's Encrypt** dans un container Docker **Certbot**, exécuter cette commande 
-depuis le dossier du projet, en remplaçant les paramètres par notre nom de domaine / sous-domaine, et adresse email :
+depuis le dossier du projet, en remplaçant les paramètres ``mydomain.com`` par notre nom de domaine et adresse email :
 
 >**⚠ Il faut s'assurer que notre nom de domaine pointe bien vers l'adresse ip publique de notre machine.**
 
