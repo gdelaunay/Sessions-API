@@ -16,6 +16,7 @@ une note sur 5, des photos et/ou un commentaire, fournissant un journal complet 
 - [Prérequis](#prérequis)
 - [Installation](#installation)
 - [Développement](#développement)
+- [Développement du front-end](#développement-du-front-end)
 - [Déploiement](#déploiement)
 - [Déploiement HTTPS](#déploiement-https)
 - [Arrêt et nettoyage](#arrêt-et-nettoyage)
@@ -83,9 +84,25 @@ Sa documentation OpenAPI est consultable à l'adresse [`http://localhost:5050/op
 et téléchargeable directement à celle-ci [`http://localhost:5050/openapi/download`](http://localhost:5050/openapi/download).
 
 
+## Développement du front-end
+
+>**Nécessite d'effectuer les étapes 1 et 3 de la section [Développement](#développement).**
+
+Pour lancer l'API en mode développement du front-end Angular [SurfSessions-Web](https://github.com/gdelaunay/SurfSessions-Web) :
+1. Décommenter la ligne ``Développement`` dans la section ``api`` du fichier ``compose.yaml``, pour ouvrir le port du container de l'API :
+```yaml
+    ports:
+      - "5050:5050"   # Développement
+```
+2. Lancer le container de la BDD MySQL et de l'API .NET avec Docker compose :
+```bash
+docker compose up mysql api
+```
+
+
 ## Déploiement
 
->**⚠ Si les modifications de la section "Développement" ont été appliquées, rétablir l’état initial.**  
+>**Si les modifications de la section [Développement](#développement) ont été appliquées, rétablir l’état initial.**  
 
 Le déploiement se fait à l'aide du fichier Docker ``compose.yaml`` qui embarque l'API .NET, la BDD MySQL, le front-end Angular, et un reverse-proxy NGINX :
 
@@ -105,7 +122,7 @@ Une fois tous les containers lancés, l'application est disponible à l'adresse 
 
 ## Déploiement HTTPS
 
->**Nécessite de vérifier l'étape 1 de la section "Déploiement".**
+>**Nécessite d'effectuer l'étape 1 de la section [Déploiement](#déploiement).**
 
 Un support du protocole HTTPS est préconfiguré, nécessitant de disposer d'un nom de domaine. Pour déployer avec HTTPS :
 
