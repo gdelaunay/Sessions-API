@@ -139,8 +139,8 @@ Un support du protocole HTTPS est préconfiguré, nécessitant de disposer d'un 
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./nginx/certs:/etc/nginx/certs:ro  # HTTPS
 ```
-2. Décommenter la section server ``HTTPS`` dans le fichier ``nginx/conf.d/default.conf`` et remplacer la valeur de ``server_name``
-par notre nom de domaine, ou sous-domaine:
+2. Décommenter la section server ``HTTPS`` dans le fichier ``nginx/conf.d/default.conf`` et remplacer tous les ``mydomain.com``
+(dans ``server_name``, ``ssl_certificate`` et ``ssl_certificate_key``) par notre nom de domaine, ou sous-domaine:
 ```nginx configuration
 # HTTPS 
 server {
