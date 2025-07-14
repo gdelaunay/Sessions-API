@@ -12,10 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
 CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("fr-FR");
 
-// Chargement des variables d'environnement du fichier .env
-DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
-Console.WriteLine(Environment.GetEnvironmentVariable("VARIABLE_TEST"));
-
 
 // ------------------------------ SERVICES ------------------------------ //
 
@@ -30,7 +26,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddHttpClient<WeatherApiService>();
 
 // Ajout du service BDD
-builder.Services.AddDbContext<AppDbContext>(options => options.UseMySQL(Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING")!));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseMySQL(Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING")!)); // Développement: MYSQL_CONNECTION_STRING_DEV
 
 // Ajout d'une configuration Cors
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
@@ -51,10 +47,18 @@ builder.Services.AddCors(options =>
 builder.Services.AddOpenApi();
 
 // Ajout d'un timestamp aux logs
-builder.Logging.AddSimpleConsole(options => { options.TimestampFormat = "HH:mm:ss - "; });
+builder.Logging.AddSimpleConsole(options => { options.TimestampFormat = "yyyy/dd/MM HH:mm:ss - "; });
+
+
+// ------------------------------ BUILD ------------------------------ //
 
 var app = builder.Build();
+
 var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("gdelaunay.Sessions-API");
+
+// Chargement des variables d'environnement du fichier .env
+DotEnvService.Logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("gdelaunay.DotEnvService");
+DotEnvService.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
 
 
 // ------------------------------ CONFIGURATION ------------------------------ //
@@ -110,7 +114,7 @@ app.Use(async (context, next) =>
 if (args.Contains("--migrate"))
 {
     using var scope = app.Services.CreateScope();
-    AppDbService.MigrateIfNeeded(scope.ServiceProvider, 3, 5);
+    AppDbService.MigrateIfNeeded(scope.ServiceProvider, 3, 10);
 }
 
 app.UseHttpsRedirection();
@@ -118,11 +122,12 @@ app.UseRouting();
 app.UseCors("AllowSpecificOrigins");
 app.UseAuthorization();
 
-
 app.MapStaticAssets();
 app.MapControllers();
 app.MapGet("/", () => "Bonjour monde!");
 
+
+// ------------------------------ START ------------------------------ //
 
 await app.StartAsync();
 
