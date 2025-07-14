@@ -10,4 +10,4 @@ riderModule.iml
 /SurfSessions-API/appsettings.json
 /SurfSessions-API/nginx/certs/*
 *.DotSettings.user
-README_PERSO.md
+README_*.md
