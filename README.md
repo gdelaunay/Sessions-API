@@ -142,7 +142,7 @@ export const sessionsApiUrl: string = sessionsApiUrl_HTTPS;
 docker compose build
 ```
 
-1. Dans le projet SurfSession-API, décommenter les lignes ``HTTPS`` dans la section ``rproxy`` du fichier ``compose.yaml``, pour ouvrir le port HTTPS et monter le volume des certificats :
+2. Dans le projet SurfSession-API, décommenter les lignes ``HTTPS`` dans la section ``rproxy`` du fichier ``compose.yaml``, pour ouvrir le port HTTPS et monter le volume des certificats :
 ```yaml
     ports:
       - "80:80"
@@ -152,7 +152,7 @@ docker compose build
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./nginx/certs:/etc/nginx/certs:ro  # HTTPS
 ```
-2. Décommenter la section server ``HTTPS`` dans le fichier ``nginx/conf.d/default.conf`` et remplacer tous les ``mydomain.com``
+3. Décommenter la section server ``HTTPS`` dans le fichier ``nginx/conf.d/default.conf`` et remplacer tous les ``mydomain.com``
 (dans ``server_name``, ``ssl_certificate`` et ``ssl_certificate_key``) par notre nom de domaine :
 ```nginx configuration
 # HTTPS 
@@ -175,7 +175,7 @@ server {
     }
 }
 ```
-3. Pour générer un certificat avec **Let's Encrypt** dans un container Docker **Certbot**, exécuter cette commande 
+4. Pour générer un certificat avec **Let's Encrypt** dans un container Docker **Certbot**, exécuter cette commande 
 depuis le dossier du projet, en remplaçant les paramètres ``mydomain.com`` par notre nom de domaine et adresse email :
 
 >**⚠ Il faut s'assurer que notre nom de domaine pointe bien vers l'adresse ip publique de notre machine.**
@@ -187,7 +187,7 @@ docker run --rm -p 80:80 -v "${PWD}/nginx/certs:/etc/letsencrypt" certbot/certbo
 Le certificat est généré dans le dossier ``nginx/certs/live/mydomain.com``, permettant de gérer d'autres domaines,
 et monté dans un volume Docker pour le reverse-proxy.
 
-4. Lancer l'application complète avec HTTPS :
+5. Lancer l'application complète avec HTTPS :
 ```bash
 docker compose up --build
 ```
