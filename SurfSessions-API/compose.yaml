@@ -47,12 +47,12 @@ services:
       - api
     ports:
       - "80:80"
-      # - "443:443"   # HTTPS
+    #  - "443:443"   # HTTPS
     networks:
       - sessions-network
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      # - ./nginx/certs:/etc/nginx/certs:ro  # HTTPS
+    #  - ./nginx/certs:/etc/nginx/certs:ro  # HTTPS
 
 
 volumes:

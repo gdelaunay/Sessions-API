@@ -1,0 +1,6 @@
+﻿*.env
+nginx/certs
+Properties
+*.user
+bin/
+obj/
