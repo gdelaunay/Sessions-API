@@ -8,8 +8,8 @@ météo marines détaillées (houle, vent...) pour ceux-ci via l'API [Open-Meteo
 Les utilisateurs peuvent paramétrer un spot en indiquant leurs conditions idéales, et peuvent activer les notifications 
 par mail pour être alertés lorsque les prévisions météo correspondent à ces conditions idéales.  
 L'application permet aussi d'enregistrer ses sessions, rattachées à un spot et aux prévisions météo du jour, ainsi qu'à 
-une note sur 5, des photos et/ou un commentaire, fournissant un journal complet des sessions passées.
-
+une note sur 5, des photos et/ou un commentaire, fournissant un journal complet des sessions passées.  
+<br>
 
 ## Sommaire
 
@@ -21,8 +21,8 @@ une note sur 5, des photos et/ou un commentaire, fournissant un journal complet 
 - [Déploiement HTTPS](#déploiement-https)
 - [Arrêt et nettoyage](#arrêt-et-nettoyage)
 - [Ressources additionnelles](#ressources-additionnelles)
-- [License](#license)
-
+- [License](#license)  
+<br>
 
 ## Prérequis
 
@@ -39,8 +39,8 @@ Si la commande n'est pas trouvée ou que la version n'est pas ``9.x.x``, install
 docker --version
 docker compose version
 ```
-Si les commandes ne sont pas trouvées, installer [Docker](https://docs.docker.com/get-docker/).
-
+Si les commandes ne sont pas trouvées, installer [Docker](https://docs.docker.com/get-docker/).  
+<br>
 
 ## Installation
 
@@ -54,7 +54,8 @@ cd SurfSessions-API
 ```bash
 cp .env.example .env
 ```
-Et modifier les valeurs ``user``, ``password`` et ``root_password``.
+Et modifier les valeurs ``user``, ``password`` et ``root_password``.  
+<br>
 
 
 ## Développement
@@ -81,7 +82,8 @@ dotnet run
 ```
 Une fois que l'API est lancée, elle est disponible à l'adresse [`http://localhost:5050/`](http://localhost:5050/).  
 Sa documentation OpenAPI est consultable à l'adresse [`http://localhost:5050/openapi/v1.json`](http://localhost:5050/openapi/v1.json)
-et téléchargeable directement à celle-ci [`http://localhost:5050/openapi/download`](http://localhost:5050/openapi/download).
+et téléchargeable directement à celle-ci [`http://localhost:5050/openapi/download`](http://localhost:5050/openapi/download).  
+<br>
 
 
 ## Développement du front-end
@@ -97,7 +99,8 @@ Pour lancer l'API en mode développement du front-end Angular [SurfSessions-Web]
 2. Lancer le container de la BDD MySQL et de l'API .NET avec Docker compose :
 ```bash
 docker compose up mysql api
-```
+```  
+<br>
 
 
 ## Déploiement
@@ -117,7 +120,8 @@ docker compose build
 ```bash
 docker compose up --build
 ```
-Une fois tous les containers lancés, l'application est disponible à l'adresse [`http://localhost:80/`](http://localhost:80/).
+Une fois tous les containers lancés, l'application est disponible à l'adresse [`http://localhost:80/`](http://localhost:80/).  
+<br>
 
 
 ## Déploiement HTTPS
@@ -175,7 +179,8 @@ et monté dans un volume Docker pour le reverse-proxy.
 ```bash
 docker compose up --build
 ```
-Une fois tous les containers lancés, l'application est disponible à l'adresse [`https://mydomain.com/`](https://mydomain.com/).
+Une fois tous les containers lancés, l'application est disponible à l'adresse [`https://mydomain.com/`](https://mydomain.com/).  
+<br>
 
 
 ## Arrêt et nettoyage
@@ -193,7 +198,8 @@ docker compose down -v
 >**⚠ Supprime toutes les ressources liées au projet (containers, volumes, images, réseaux).**
 ```bash
 docker compose down --rmi all -v
-```
+```  
+<br>
 
 
 ## Ressources additionnelles
@@ -202,7 +208,8 @@ docker compose down --rmi all -v
 - [Documentation EF Core](https://learn.microsoft.com/ef/core/)
 - [Documentation Docker compose](https://docs.docker.com/compose/)
 - [Documentation reverse proxy NGINX](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)
-- [Intégration d'OpenApi dans Postman](https://learning.postman.com/docs/integrations/available-integrations/working-with-openAPI/)
+- [Intégration d'OpenApi dans Postman](https://learning.postman.com/docs/integrations/available-integrations/working-with-openAPI/)  
+  <br>
 
 
 ## License
