@@ -2,48 +2,72 @@ pipeline {
   agent any
 
   environment {
-    GIT_REPO_URL = 'http://github.com/2iAcademy/SurfSessions-API'
-    GIT_REPO_NAME = 'SurfSessions-API-main'
-    APP_FOLDER = 'SurfSessions-API'
-    PATH = "/opt/bin:/opt/sbin:${env.PATH}"
+    GH_API_URL = 'https://github.com/gdelaunay/SurfSessions-API.git'
+    GH_WEB_URL = 'https://github.com/gdelaunay/SurfSessions-Web.git'
+    API_FOLDER = 'SurfSessions-API'
+    WEB_FOLDER = 'SurfSessions-Web'
   }
 
   stages {
-     
-    stage('Téléchargement des sources') {
+    
+    stage('Checkout des dépôts GitHub ... ') {
+        steps {
+            dir(WEB_FOLDER) {
+                git url: 'https://github.com/gdelaunay/SurfSessions-Web.git', branch: 'main'
+            }
+            dir(API_FOLDER) {
+                git url: 'https://github.com/gdelaunay/SurfSessions-API.git', branch: 'main'
+            }
+        }
+    }
+         
+    stage('Modifications pour HTTPS ... '){
+        steps {
+            sh'''
+                sed -i "s|const sessionsApiUrl_HTTPS =.*|const sessionsApiUrl_HTTPS = 'https://sessions.gdelaunay.fr/api';|" ${WEB_FOLDER}/src/app/app.component.ts
+                sed -i "s|export const sessionsApiUrl.*|export const sessionsApiUrl: string = sessionsApiUrl_HTTPS;|" ${WEB_FOLDER}/src/app/app.component.ts
+                cp ../HTTPS/sessions/compose.yaml ${API_FOLDER}/${API_FOLDER}/compose.yaml
+                cp ../HTTPS/sessions/default.conf ${API_FOLDER}/${API_FOLDER}/nginx/conf.d/default.conf 
+            '''
+        }
+    }
+   
+    stage('Build de l\'image Session-Web ... ') {
       steps {
         sh '''
-          echo "[1/5] Nettoyage..."
-          rm -rf "${APP_FOLDER}" repo.zip "${GIT_REPO_NAME}"
-
-          echo "[2/5] Téléchargement ZIP depuis GitHub..."
-          curl -L -o repo.zip ${GIT_REPO_URL}/archive/refs/heads/main.zip
-
-          echo "[3/5] Décompression et extraction de '${APP_FOLDER}'..."
-          unzip repo.zip
-          mv "${GIT_REPO_NAME}/${APP_FOLDER}" ./
-
-          echo "[4/5] Nettoyage des fichiers temporaires..."
-          rm -rf ${GIT_REPO_NAME} repo.zip
-          
-          echo "[5/5] Récupération des secrets d'environment..."
-          cp ./secrets/sessions.env "./${APP_FOLDER}/.env"
+            docker compose -f "${WEB_FOLDER}/compose.yaml" build
+        '''
+      }
+    }     
+    
+    stage('Approvisionnement des secrets ... ') {
+      steps {
+        sh '''
+            cp ../secrets/sessions.env "./${API_FOLDER}/${API_FOLDER}/.env"
         '''
       }
     }
-
-    stage('Arrêt des anciens containers') {
+    
+    stage('Arrêt des anciens containers ... ') {
       steps {
         sh '''
-          docker compose -f "${APP_FOLDER}/docker-compose.yaml" down || true
+          docker compose -f "${API_FOLDER}/${API_FOLDER}/compose.yaml" down || true
         '''
       }
     }
-
-    stage('Build et lancement') {
+    
+    stage('Génération du certificat SSL (seulement si nécessaire) ... '){
+        steps{
+            sh'''
+              docker run --rm -p 80:80 -v "${PWD}/${API_FOLDER}/${API_FOLDER}/nginx/certs:/etc/letsencrypt" certbot/certbot certonly --standalone --keep-until-expiring -d sessions.gdelaunay.fr --non-interactive --agree-tos -m contact@gdelaunay.fr
+            '''
+        }
+    }
+    
+    stage('Build et lancement ... ') {
       steps {
         sh '''
-          docker compose -f "${APP_FOLDER}/docker-compose.yaml" up -d --build
+          docker compose -f "${API_FOLDER}/${API_FOLDER}/compose.yaml" up -d --build
         '''
       }
     }
