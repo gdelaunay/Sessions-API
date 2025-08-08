@@ -59,7 +59,9 @@ pipeline {
     stage('Génération du certificat SSL (seulement si nécessaire) ... '){
         steps{
             sh'''
+              docker stop nginx-proxy-manager
               docker run --rm -p 80:80 -v "${PWD}/${API_FOLDER}/${API_FOLDER}/nginx/certs:/etc/letsencrypt" certbot/certbot certonly --standalone --keep-until-expiring -d sessions.gdelaunay.fr --non-interactive --agree-tos -m contact@gdelaunay.fr
+              docker start nginx-proxy-manager
             '''
         }
     }
