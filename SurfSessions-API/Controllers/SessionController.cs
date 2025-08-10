@@ -50,7 +50,7 @@ public class SessionController(AppDbContext context) : Controller
         return CreatedAtAction(nameof(Get), new { id = session.Id }, session);
     }
     
-    [HttpPut]
+    [HttpPut("{id:int}")]
     public async Task<ActionResult<Session>> Put(int id, Session updatedSession)
     {
         var session = await _context.Sessions.FindAsync(id);
@@ -63,7 +63,7 @@ public class SessionController(AppDbContext context) : Controller
         return NoContent();
     }
     
-    [HttpDelete]
+    [HttpDelete("{id:int}")]
     public async Task<ActionResult<Session>> Delete(int id)
     {
         var session = await _context.Sessions.FindAsync(id);

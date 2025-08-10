@@ -65,7 +65,7 @@ public class ForecastController(WeatherApiService weatherService, AppDbContext c
         return CreatedAtAction(nameof(Get), new { id = forecast.Id }, forecast);
     }
     
-    [HttpPut]
+    [HttpPut("{id:int}")]
     public async Task<ActionResult<Forecast>> Put(int id, Forecast updatedForecast)
     {
         var forecast = await _context.Forecasts.FindAsync(id);
@@ -78,7 +78,7 @@ public class ForecastController(WeatherApiService weatherService, AppDbContext c
         return NoContent();
     }
     
-    [HttpDelete]
+    [HttpDelete("{id:int}")]
     public async Task<ActionResult<Forecast>> Delete(int id)
     {
         var forecast = await _context.Forecasts.FindAsync(id);

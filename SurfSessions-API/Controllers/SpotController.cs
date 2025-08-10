@@ -33,7 +33,7 @@ public class SpotController(AppDbContext context) : Controller
         return CreatedAtAction(nameof(Get), new { id = spot.Id }, spot);
     }
     
-    [HttpPut]
+    [HttpPut("{id:int}")]
     public async Task<ActionResult<Spot>> Put(int id, Spot updatedSpot)
     {
         var spot = await _context.Spots.FindAsync(id);
@@ -46,7 +46,7 @@ public class SpotController(AppDbContext context) : Controller
         return NoContent();
     }
     
-    [HttpDelete]
+    [HttpDelete("{id:int}")]
     public async Task<ActionResult<Spot>> Delete(int id)
     {
         var spot = await _context.Spots.FindAsync(id);
