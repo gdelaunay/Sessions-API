@@ -28,7 +28,9 @@ public class SessionController(AppDbContext context) : Controller
     [HttpGet("{id:int}")]
     public async Task<ActionResult<Session>> Get(int id)
     {
-        return await _context.Sessions.Include(s => s.Spot).FirstOrDefaultAsync(s => s.Id == id) ?? (ActionResult<Session>) NotFound();
+        return await _context.Sessions.Include(s => s.Spot)
+            .Include(s => s.Forecast)
+            .FirstOrDefaultAsync(s => s.Id == id) ?? (ActionResult<Session>) NotFound();
     }
     
     [HttpPost]
