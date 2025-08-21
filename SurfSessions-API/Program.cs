@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SurfSessions_API;
 using SurfSessions_API.Data;
@@ -14,6 +16,9 @@ CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("fr-FR");
 
 
 // ------------------------------ SERVICES ------------------------------ //
+
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<AppDbContext>();
 
 // Ajout des controllers
 builder.Services.AddControllers().AddJsonOptions(options =>
@@ -62,6 +67,36 @@ DotEnvService.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
 
 
 // ------------------------------ CONFIGURATION ------------------------------ //
+
+app.MapIdentityApi<IdentityUser>();
+
+// Mappage d'une route de déconnexion, pas incluse dans l'IdentityApi pour une certaine raison
+app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager, [FromBody] object empty) =>
+{
+    if (empty != null)
+    {
+        await signInManager.SignOutAsync();
+        return Results.Ok();
+    }
+    return Results.Unauthorized();
+})
+.WithOpenApi()
+.RequireAuthorization();
+
+// Mappage de suppression de compte, idem
+app.MapDelete("/account", async (UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, HttpContext http) =>
+        {
+            var user = await userManager.GetUserAsync(http.User);
+            if (user == null) return Results.BadRequest("Utilisateur non trouvé.");
+
+            var result = await userManager.DeleteAsync(user);
+            if (!result.Succeeded) return Results.BadRequest(result.Errors);
+
+            await signInManager.SignOutAsync();
+            return Results.NoContent();
+        })
+    .WithOpenApi()
+    .RequireAuthorization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -123,8 +158,10 @@ app.UseCors("AllowSpecificOrigins");
 app.UseAuthorization();
 
 app.MapStaticAssets();
-app.MapControllers();
-app.MapGet("/", () => "Bonjour monde!");
+
+app.MapControllers().RequireAuthorization();
+
+app.MapGet("/", () => "Bonjour monde!").RequireAuthorization();
 
 
 // ------------------------------ START ------------------------------ //
