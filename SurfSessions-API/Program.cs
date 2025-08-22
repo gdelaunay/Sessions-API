@@ -41,9 +41,9 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins(allowedOrigins!)
-                .SetIsOriginAllowedToAllowWildcardSubdomains()
                 .AllowAnyMethod()
                 .AllowAnyHeader()
+                .AllowCredentials()
                 .WithExposedHeaders("Location");
         });
 });
@@ -68,10 +68,11 @@ DotEnvService.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
 
 // ------------------------------ CONFIGURATION ------------------------------ //
 
-app.MapIdentityApi<IdentityUser>();
+var identityGroup = app.MapGroup("/api");
+identityGroup.MapIdentityApi<IdentityUser>();
 
 // Mappage d'une route de déconnexion, pas incluse dans l'IdentityApi pour une certaine raison
-app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager, [FromBody] object empty) =>
+identityGroup.MapPost("/logout", async (SignInManager<IdentityUser> signInManager, [FromBody] object empty) =>
 {
     if (empty != null)
     {
@@ -84,7 +85,7 @@ app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager, [FromBo
 .RequireAuthorization();
 
 // Mappage de suppression de compte, idem
-app.MapDelete("/account", async (UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, HttpContext http) =>
+identityGroup.MapDelete("/account", async (UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, HttpContext http) =>
         {
             var user = await userManager.GetUserAsync(http.User);
             if (user == null) return Results.BadRequest("Utilisateur non trouvé.");
@@ -95,6 +96,20 @@ app.MapDelete("/account", async (UserManager<IdentityUser> userManager, SignInMa
             await signInManager.SignOutAsync();
             return Results.NoContent();
         })
+    .WithOpenApi()
+    .RequireAuthorization();
+
+// Mappage récupération du compte connecté
+identityGroup.MapGet("/account", async (UserManager<IdentityUser> userManager, HttpContext http) =>
+    {
+        var user = await userManager.GetUserAsync(http.User);
+        if (user == null) return Results.Unauthorized();
+
+        return Results.Ok(new {
+            Id = user.Id,
+            UserName = user.UserName
+        });
+    })
     .WithOpenApi()
     .RequireAuthorization();
 
@@ -128,6 +143,17 @@ app.Use(async (context, next) =>
         context.Request.EnableBuffering();
         body = await new StreamReader(context.Request.Body, Encoding.UTF8, leaveOpen: true).ReadToEndAsync();
         context.Request.Body.Position = 0;
+    }
+    
+    try
+    {
+        var json = System.Text.Json.JsonDocument.Parse(body);
+        var dict = json.RootElement.EnumerateObject().ToDictionary(p => p.Name, p => p.Name.Equals("password", StringComparison.OrdinalIgnoreCase) ? "***" : p.Value.ToString());
+        body = System.Text.Json.JsonSerializer.Serialize(dict, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+    }
+    catch (Exception)
+    {
+        // ignored
     }
 
     var loggerHttp = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("gdelaunay.HttpRequestLogger");
