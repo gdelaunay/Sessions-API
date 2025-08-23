@@ -19,6 +19,7 @@ public class Forecast
     }
     
     public int Id { get; set; } 
+    
     [MaxLength(255)]
     public string DateTime { get; set; } = string.Empty;
     public int WeatherCode { get; set; }
