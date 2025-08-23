@@ -24,8 +24,8 @@ pipeline {
     stage('Modifications pour HTTPS ... '){
         steps {
             sh'''
-                sed -i "s|const sessionsApiUrl_HTTPS =.*|const sessionsApiUrl_HTTPS = 'https://sessions.gdelaunay.fr/api';|" ${WEB_FOLDER}/src/app/app.component.ts
-                sed -i "s|export const sessionsApiUrl.*|export const sessionsApiUrl: string = sessionsApiUrl_HTTPS;|" ${WEB_FOLDER}/src/app/app.component.ts
+                sed -i "s|const sessionsApiUrl_HTTPS =.*|const sessionsApiUrl_HTTPS = 'https://sessions.gdelaunay.fr/api';|" ${WEB_FOLDER}/src/app/app.ts
+                sed -i "s|export const sessionsApiUrl.*|export const sessionsApiUrl: string = sessionsApiUrl_HTTPS;|" ${WEB_FOLDER}/src/app/app.ts
                 cp ../HTTPS/sessions/compose.yaml ${API_FOLDER}/${API_FOLDER}/compose.yaml
                 cp ../HTTPS/sessions/default.conf ${API_FOLDER}/${API_FOLDER}/nginx/conf.d/default.conf 
             '''
