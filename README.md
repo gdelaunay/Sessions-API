@@ -1,7 +1,7 @@
 # Sessions-API
 
 API web ASP.NET Core (.NET 9) avec EF core et une BDD MySQL, back-end de l'application **Sessions**.  
-→ Angular front-end de l'application **Sessions** : [SurfSessions-Web](https://github.com/gdelaunay/SurfSessions-Web)  
+→ Angular front-end de l'application **Sessions** : [Sessions-Web](https://github.com/gdelaunay/Sessions-Web)  
 <br>
 Elle permet aux utilisateurs de créer des spots avec une position géographique, et d'obtenir des prévisions de 
 météo marines détaillées (houle, vent...) pour ceux-ci via l'API [Open-Meteo](https://open-meteo.com/).  
