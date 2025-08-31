@@ -1,4 +1,4 @@
-# SurfSessions-API
+# Sessions-API
 
 API web ASP.NET Core (.NET 9) avec EF core et une BDD MySQL, back-end de l'application **Sessions**.  
 → Angular front-end de l'application **Sessions** : [SurfSessions-Web](https://github.com/gdelaunay/SurfSessions-Web)  
