@@ -29,7 +29,9 @@ public class SpotController(AppDbContext context) : Controller
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null) return Unauthorized();
-        return await _context.Spots.FirstOrDefaultAsync(s => s.Id == id && s.OwnerId == userId) ?? (ActionResult<Spot>) NotFound();
+        var spot = await _context.Spots.FirstOrDefaultAsync(s => s.Id == id && s.OwnerId == userId);
+        if (spot == null) return NotFound("Le spot n'existe pas.");
+        return Ok(spot);
     }
     
     [HttpPost]
