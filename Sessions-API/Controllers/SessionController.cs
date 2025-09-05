@@ -1,13 +1,12 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SurfSessions_API.Data;
-using SurfSessions_API.Models;
+using Sessions_API.Data;
+using Sessions_API.Models;
 
-namespace SurfSessions_API.Controllers;
+namespace Sessions_API.Controllers;
 
 [Authorize] 
 [EnableCors]

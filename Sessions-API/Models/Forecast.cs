@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SurfSessions_API.Models;
+namespace Sessions_API.Models;
 
 public class Forecast
 {

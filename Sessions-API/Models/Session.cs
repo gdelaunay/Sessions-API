@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace SurfSessions_API.Models;
+namespace Sessions_API.Models;
 
 public class Session
 { 

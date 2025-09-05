@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SurfSessions_API.Data;
-using SurfSessions_API.Models;
-using SurfSessions_API.Services;
+using Sessions_API.Data;
+using Sessions_API.Models;
+using Sessions_API.Services;
 
-namespace SurfSessions_API.Controllers;
+namespace Sessions_API.Controllers;
 
 [EnableCors]
 [ApiController]

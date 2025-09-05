@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace SurfSessions_API.Data;
+namespace Sessions_API.Data;
 
 public static class AppDbService
 {

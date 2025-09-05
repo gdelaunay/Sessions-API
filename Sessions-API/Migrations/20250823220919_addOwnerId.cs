@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace SurfSessions_API.Migrations
+namespace Sessions_API.Migrations
 {
     /// <inheritdoc />
     public partial class addOwnerId : Migration

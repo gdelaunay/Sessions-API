@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace SurfSessions_API.Services;
+namespace Sessions_API.Services;
 
 public static class DotEnvService
 {

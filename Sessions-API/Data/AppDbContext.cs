@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using SurfSessions_API.Models;
+using Microsoft.EntityFrameworkCore;
+using Sessions_API.Models;
 
-namespace SurfSessions_API.Data;
+namespace Sessions_API.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<IdentityUser>(options)
 {

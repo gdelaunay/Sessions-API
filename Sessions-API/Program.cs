@@ -4,9 +4,8 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SurfSessions_API;
-using SurfSessions_API.Data;
-using SurfSessions_API.Services;
+using Sessions_API.Data;
+using Sessions_API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +30,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddHttpClient<WeatherApiService>();
 
 // Ajout du service BDD
-builder.Services.AddDbContext<AppDbContext>(options => options.UseMySQL(Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING")!)); // Développement: MYSQL_CONNECTION_STRING_DEV
+builder.Services.AddDbContext<AppDbContext>(options => options.UseMySQL(Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING_DEV")!)); // Développement: MYSQL_CONNECTION_STRING_DEV
 
 // Ajout d'une configuration Cors
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();

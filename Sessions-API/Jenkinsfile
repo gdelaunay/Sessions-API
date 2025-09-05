@@ -2,10 +2,10 @@ pipeline {
   agent any
 
   environment {
-    GH_API_URL = 'https://github.com/gdelaunay/SurfSessions-API.git'
-    GH_WEB_URL = 'https://github.com/gdelaunay/SurfSessions-Web.git'
-    API_FOLDER = 'SurfSessions-API'
-    WEB_FOLDER = 'SurfSessions-Web'
+    GH_API_URL = 'https://github.com/gdelaunay/Sessions-API.git'
+    GH_WEB_URL = 'https://github.com/gdelaunay/Sessions-Web.git'
+    API_FOLDER = 'Sessions-API'
+    WEB_FOLDER = 'Sessions-Web'
   }
 
   stages {
@@ -13,10 +13,10 @@ pipeline {
     stage('Checkout des dépôts GitHub ... ') {
         steps {
             dir(WEB_FOLDER) {
-                git url: 'https://github.com/gdelaunay/SurfSessions-Web.git', branch: 'main'
+                git url: 'https://github.com/gdelaunay/Sessions-Web.git', branch: 'main'
             }
             dir(API_FOLDER) {
-                git url: 'https://github.com/gdelaunay/SurfSessions-API.git', branch: 'main'
+                git url: 'https://github.com/gdelaunay/Sessions-API.git', branch: 'main'
             }
         }
     }

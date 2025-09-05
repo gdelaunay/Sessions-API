@@ -4,7 +4,7 @@ using MySql.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace SurfSessions_API.Migrations
+namespace Sessions_API.Migrations
 {
     /// <inheritdoc />
     public partial class AddIdentity : Migration

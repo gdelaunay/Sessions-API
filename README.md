@@ -45,8 +45,8 @@ Si les commandes ne sont pas trouvées, installer [Docker](https://docs.docker.c
 
 1. Cloner le dépôt :
 ```bash
-git clone https://github.com/gdelaunay/SurfSessions-API.git
-cd SurfSessions-API/SurfSessions-API
+git clone https://github.com/gdelaunay/Sessions-API.git
+cd Sessions-API/Sessions-API
 ```
 
 2. Copier le fichier ``.env`` d'exemple :
@@ -89,7 +89,7 @@ et téléchargeable directement à celle-ci [`http://localhost:5050/openapi/down
 
 >**Nécessite d'effectuer les étapes 1 et 3 de la section [Développement](#développement).**
 
-Pour lancer l'API en mode développement du front-end Angular [SurfSessions-Web](https://github.com/gdelaunay/SurfSessions-Web) :
+Pour lancer l'API en mode développement du front-end Angular [Sessions-Web](https://github.com/gdelaunay/Sessions-Web) :
 1. Décommenter la ligne ``Développement`` dans la section ``api`` du fichier ``compose.yaml``, pour ouvrir le port du container de l'API :
 ```yaml
     ports:
@@ -108,14 +108,14 @@ docker compose up mysql api
 
 Le déploiement se fait à l'aide du fichier Docker ``compose.yaml`` qui embarque l'API .NET, la BDD MySQL, le front-end Angular, et un reverse-proxy NGINX :
 
-1. Si ce n'est pas déjà fait, installer le projet [SurfSessions-Web](https://github.com/gdelaunay/SurfSessions-Web) dans
+1. Si ce n'est pas déjà fait, installer le projet [Sessions-Web](https://github.com/gdelaunay/Sessions-Web) dans
 un nouveau dossier et construire son image Docker (requise par le  ``compose.yaml``) :
 ```bash
-git clone https://github.com/gdelaunay/SurfSessions-Web.git
-cd SurfSessions-Web
+git clone https://github.com/gdelaunay/Sessions-Web.git
+cd Sessions-Web
 docker compose build
 ```
-2. Lancer l'application complète, depuis le dossier du projet SurfSessions-API :
+2. Lancer l'application complète, depuis le dossier du projet Sessions-API :
 ```bash
 docker compose up --build
 ```
@@ -127,9 +127,9 @@ Une fois tous les containers lancés, l'application est disponible à l'adresse 
 
 Un support du protocole HTTPS est préconfiguré, nécessitant de disposer d'un nom de domaine. Pour déployer avec HTTPS :
 
-1. Si ce n'est pas déjà fait, installer le projet [SurfSessions-Web](https://github.com/gdelaunay/SurfSessions-Web) dans un nouveau dossier :
+1. Si ce n'est pas déjà fait, installer le projet [Sessions-Web](https://github.com/gdelaunay/Sessions-Web) dans un nouveau dossier :
 ```bash
-git clone https://github.com/gdelaunay/SurfSessions-Web.git
+git clone https://github.com/gdelaunay/Sessions-Web.git
 ```
 - Modifier la valeur de ``sessionsApiUrl`` dans ``src/app/app.component.ts - ligne:7``, en remplacant ``mydomain.com`` par notre nom de domaine, ou sous-domaine :
 ```typescript

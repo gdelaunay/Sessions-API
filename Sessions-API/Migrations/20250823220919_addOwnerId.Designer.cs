@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SurfSessions_API.Data;
+using Sessions_API.Data;
 
 #nullable disable
 
-namespace SurfSessions_API.Migrations
+namespace Sessions_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20250823220919_addOwnerId")]
@@ -214,7 +214,7 @@ namespace SurfSessions_API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SurfSessions_API.Models.Forecast", b =>
+            modelBuilder.Entity("Sessions_API.Models.Forecast", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -251,7 +251,7 @@ namespace SurfSessions_API.Migrations
                     b.ToTable("Forecasts");
                 });
 
-            modelBuilder.Entity("SurfSessions_API.Models.Session", b =>
+            modelBuilder.Entity("Sessions_API.Models.Session", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -290,7 +290,7 @@ namespace SurfSessions_API.Migrations
                     b.ToTable("Sessions");
                 });
 
-            modelBuilder.Entity("SurfSessions_API.Models.Spot", b =>
+            modelBuilder.Entity("Sessions_API.Models.Spot", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -367,15 +367,15 @@ namespace SurfSessions_API.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SurfSessions_API.Models.Session", b =>
+            modelBuilder.Entity("Sessions_API.Models.Session", b =>
                 {
-                    b.HasOne("SurfSessions_API.Models.Forecast", "Forecast")
+                    b.HasOne("Sessions_API.Models.Forecast", "Forecast")
                         .WithMany()
                         .HasForeignKey("ForecastId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SurfSessions_API.Models.Spot", "Spot")
+                    b.HasOne("Sessions_API.Models.Spot", "Spot")
                         .WithMany("Sessions")
                         .HasForeignKey("SpotId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -386,7 +386,7 @@ namespace SurfSessions_API.Migrations
                     b.Navigation("Spot");
                 });
 
-            modelBuilder.Entity("SurfSessions_API.Models.Spot", b =>
+            modelBuilder.Entity("Sessions_API.Models.Spot", b =>
                 {
                     b.Navigation("Sessions");
                 });

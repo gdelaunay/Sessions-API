@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using SurfSessions_API.Models;
+using Sessions_API.Models;
 
-namespace SurfSessions_API.Services;
+namespace Sessions_API.Services;
 
 
 public class WeatherApiService(HttpClient httpClient, ILogger<WeatherApiService> logger)
