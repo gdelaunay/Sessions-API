@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurfSessions-API", "SurfSessions-API\SurfSessions-API.csproj", "{EEA5BBA4-EA28-499B-A78C-C657DD3401C4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sessions-API", "Sessions-API\Sessions-API.csproj", "{EEA5BBA4-EA28-499B-A78C-C657DD3401C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
