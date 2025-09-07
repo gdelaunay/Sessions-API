@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -50,7 +49,8 @@ public class SpotControllerTests
         var resultPut = await spotController.Put(1, new Spot { Id = 1, Name = "Margaret Plage - Préfailles", Latitude = 47.12f, Longitude = -2.21f});
         Assert.IsType<UnauthorizedResult>(resultPut.Result);
         
-        
+        var deleteResult = await spotController.Delete(1);
+        Assert.IsType<UnauthorizedResult>(deleteResult.Result);
     }    
     
     [Fact]

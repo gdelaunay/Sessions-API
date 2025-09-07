@@ -37,9 +37,11 @@ public class SessionController(AppDbContext context) : Controller
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null) return Unauthorized();
-        return await _context.Sessions.Include(s => s.Spot)
+        var session = await _context.Sessions.Include(s => s.Spot)
             .Include(s => s.Forecast)
-            .FirstOrDefaultAsync(s => s.Id == id && s.OwnerId == userId) ?? (ActionResult<Session>) NotFound();
+            .FirstOrDefaultAsync(s => s.Id == id && s.OwnerId == userId);
+        if (session == null) return NotFound("La session n'existe pas.");
+        return Ok(session);
     }
     
     [HttpPost]
