@@ -74,6 +74,7 @@ public class SessionController(AppDbContext context) : Controller
         if (session.OwnerId != userId) return Unauthorized();
         
         _context.Entry(session).CurrentValues.SetValues(updatedSession);
+        _context.Entry(session).Property(s => s.OwnerId).IsModified = false;
         await _context.SaveChangesAsync();
         return NoContent();
     }

@@ -57,6 +57,7 @@ public class SpotController(AppDbContext context) : Controller
         if (spot.OwnerId != userId) return Unauthorized();
         
         _context.Entry(spot).CurrentValues.SetValues(updatedSpot);
+        _context.Entry(spot).Property(s => s.OwnerId).IsModified = false;
         await _context.SaveChangesAsync();
         return NoContent();
     }
