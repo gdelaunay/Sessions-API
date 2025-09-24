@@ -170,7 +170,7 @@ app.Use(async (context, next) =>
     await next();
 });
 
-// Effectue la migration de la BDD...
+// Effectue la migration de la BDD
 if (args.Contains("--migrate"))
 {
     using var scope = app.Services.CreateScope();
